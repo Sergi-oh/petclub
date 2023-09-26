@@ -1,5 +1,5 @@
 const pg = require('pg');
-const client = new pg.Client('postgres://localhost/fullstack_template_db');
+const client = new pg.Client('postgres://localhost/petclub_db');
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -20,8 +20,27 @@ const init = async()=> {
   await client.connect();
   console.log('connected to database');
   const SQL = `
-    SQL SETUP AND SEED
+    DROP TABLE IF EXISTS pets;
+    DROP TABLE IF EXISTS owners;
+    CREATE TABLE owners(
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(100)
+    );
+    CREATE TABLE pets(
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(100),
+      owner_id INTEGER REFERENCES owners(id)
+    );
+      INSERT INTO owners(name) VALUES ('Moe');
+      INSERT INTO owners(name) VALUES ('Lucy');
+      INSERT INTO owners(name) VALUES ('Ethyl');
+      INSERT INTO owners(name) VALUES ('Curly');
+      INSERT INTO pets(name, owner_id) VALUES('Fido', (SELECT id FROM owners WHERE name=''));
+      INSERT INTO pets(name, owner_id) VALUES('Rex', (SELECT id FROM owners WHERE name=''));
+      INSERT INTO pets(name, owner_id) VALUES('Tiger', (SELECT id FROM owners WHERE name=''));
+      INSERT INTO pets(name, owner_id) VALUES('Fluffy', (SELECT id FROM owners WHERE name=''));
   `;
+  await client.query(SQL);
   console.log('create your tables and seed data');
 
   const port = process.env.PORT || 3000;
